@@ -285,6 +285,28 @@ export const canvasSlice = createSlice({
         (obj, index) => index !== state.layerState.selectedImageIndex
       );
     },
+    sendBackward: (state) => {
+      state.pastLayerStates.push(_.cloneDeep(state.layerState));
+      const idx = state.layerState.selectedImageIndex;
+      if (idx <= 0) {
+        return;
+      }
+      const tmp = state.layerState.objects[idx];
+      state.layerState.objects[idx] = state.layerState.objects[idx - 1];
+      state.layerState.objects[idx - 1] = tmp;
+      state.layerState.selectedImageIndex = idx - 1;
+    },
+    bringForward: (state) => {
+      state.pastLayerStates.push(_.cloneDeep(state.layerState));
+      const idx = state.layerState.selectedImageIndex;
+      if (idx >= state.layerState.objects.length-1) {
+        return;
+      }
+      const tmp = state.layerState.objects[idx];
+      state.layerState.objects[idx] = state.layerState.objects[idx + 1];
+      state.layerState.objects[idx + 1] = tmp;
+      state.layerState.selectedImageIndex = idx + 1;
+    },
     setStageCoordinates: (state, action: PayloadAction<Vector2d>) => {
       state.stageCoordinates = action.payload;
     },
@@ -1002,6 +1024,9 @@ export const {
   deleteSelectedImage,
   dragEnd,
   transformEnd,
+  sendBackward,
+  bringForward,
+
 } = canvasSlice.actions;
 
 export default canvasSlice.reducer;

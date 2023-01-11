@@ -1,11 +1,12 @@
 import { ButtonGroup } from '@chakra-ui/react';
 import { createSelector } from '@reduxjs/toolkit';
 import {
+  bringForward,
   deleteSelectedImage,
   removeBackground,
   resetCanvas,
   resetCanvasView,
-  resizeAndScaleCanvas,
+  resizeAndScaleCanvas, sendBackward,
   setIsMaskEnabled,
   setLayer, setSelectedImage,
   setTool,
@@ -14,12 +15,12 @@ import { useAppDispatch, useAppSelector } from 'app/storeHooks';
 import _ from 'lodash';
 import IAIIconButton from 'common/components/IAIIconButton';
 import {
-  FaArrowsAlt,
+  FaArrowsAlt, FaBackward,
   FaCopy,
   FaCrosshairs,
-  FaDownload,
+  FaDownload, FaForward,
   FaLayerGroup, FaRemoveFormat,
-  FaSave,
+  FaSave, FaStepBackward, FaStepForward,
   FaTrash,
   FaUpload, FaUserAltSlash, FaUserCheck,
 } from 'react-icons/fa';
@@ -273,6 +274,43 @@ const IAICanvasOutpaintingControls = () => {
   };
 
 
+  const handleSendBackward = () => {
+    dispatch(
+      sendBackward()
+    );
+  };
+
+
+  const handleBringForward = () => {
+    dispatch(
+      bringForward()
+    );
+  };
+
+  useHotkeys(
+    ['w'],
+    () => {
+      handleSendBackward();
+    },
+    {
+      enabled: () => !isStaging,
+      preventDefault: true,
+    },
+    []
+  );
+
+  useHotkeys(
+    ['e'],
+    () => {
+      handleBringForward();
+    },
+    {
+      enabled: () => !isStaging,
+      preventDefault: true,
+    },
+    []
+  );
+
   return (
     <>
     <div className="inpainting-settings">
@@ -385,17 +423,17 @@ const IAICanvasOutpaintingControls = () => {
 
         <ButtonGroup isAttached>
           <IAIIconButton
-            aria-label={`${t('common:bg')}`}
-            tooltip={`${t('common:bg')}`}
-            icon={<FaUserCheck />}
-            onClick={handleRemoveBackground}
+            aria-label={`${t('common:sendBackward')}`}
+            tooltip={`${t('common:sendBackward')}`}
+            icon={<FaStepBackward />}
+            onClick={handleSendBackward}
             isDisabled={isStaging}
           />
           <IAIIconButton
-            aria-label={`${t('common:deleteObject')}`}
-            tooltip={`${t('common:deleteObject')}`}
-            icon={<FaTrash />}
-            onClick={handleDeleteObject}
+            aria-label={`${t('common:bringForward')}`}
+            tooltip={`${t('common:bringForward')}`}
+            icon={<FaStepForward />}
+            onClick={handleBringForward}
             isDisabled={isStaging}
           />
         </ButtonGroup>

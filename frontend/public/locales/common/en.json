@@ -56,5 +56,7 @@
   "statusLoadingModel": "Loading Model",
   "statusModelChanged": "Model Changed",
   "bg": "Remove Background",
-  "deleteObject": "Delete Object"
+  "deleteObject": "Delete Object",
+  "sendBackward": "Send Backward",
+  "bringForward": "Bring Forward",
 }

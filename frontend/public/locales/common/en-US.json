@@ -52,5 +52,9 @@
   "statusUpscaling": "Upscaling",
   "statusUpscalingESRGAN": "Upscaling (ESRGAN)",
   "statusLoadingModel": "Loading Model",
-  "statusModelChanged": "Model Changed"
+  "statusModelChanged": "Model Changed",
+  "bg": "Remove Background",
+  "deleteObject": "Delete Object",
+  "sendBackward": "Send Backward",
+  "bringForward": "Bring Forward"
 }
