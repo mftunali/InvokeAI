@@ -1,25 +1,22 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
-import { createSlice } from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import * as InvokeAI from 'app/invokeai';
-import {
-  roundDownToMultiple,
-  roundToMultiple,
-} from 'common/util/roundDownToMultiple';
-import { IRect, Vector2d } from 'konva/lib/types';
+import {roundDownToMultiple, roundToMultiple,} from 'common/util/roundDownToMultiple';
+import {IRect, Vector2d} from 'konva/lib/types';
 import _ from 'lodash';
-import { RgbaColor } from 'react-colorful';
+import {RgbaColor} from 'react-colorful';
 import calculateCoordinates from '../util/calculateCoordinates';
 import calculateScale from '../util/calculateScale';
-import { STAGE_PADDING_PERCENTAGE } from '../util/constants';
+import {STAGE_PADDING_PERCENTAGE} from '../util/constants';
 import floorCoordinates from '../util/floorCoordinates';
 import getScaledBoundingBoxDimensions from '../util/getScaledBoundingBoxDimensions';
 import roundDimensionsTo64 from '../util/roundDimensionsTo64';
 import {
   BoundingBoxScale,
+  CanvasBaseLine,
   CanvasImage,
   CanvasLayer,
   CanvasLayerState,
-  CanvasBaseLine,
   CanvasMaskLine,
   CanvasState,
   CanvasTool,
@@ -28,6 +25,8 @@ import {
   isCanvasBaseImage,
   isCanvasMaskLine,
 } from './canvasTypes';
+
+import {v4 as uuidv4} from 'uuid';
 
 export const initialLayerState: CanvasLayerState = {
   objects: [],
@@ -195,10 +194,12 @@ export const canvasSlice = createSlice({
           {
             kind: 'image',
             layer: 'base',
+            id: uuidv4(),
             x: 0,
             y: 0,
             width: image.width,
             height: image.height,
+            angle: 0,
             image: image,
           },
         ],
@@ -236,8 +237,53 @@ export const canvasSlice = createSlice({
         state.scaledBoundingBoxDimensions = scaledDimensions;
       }
     },
+    setImageDimensions: (state, action) => {
+      const imageObjects = state.layerState.objects as CanvasImage[];
+      //Get object equals to id
+      const imageId = imageObjects.findIndex(
+        (obj) => obj.id === action.payload.id
+      );
+
+      state.layerState.objects[imageId].width = action.payload.width;
+      state.layerState.objects[imageId].height = action.payload.height;
+    },
+    setImageRotation: (state, action) => {
+      const imageObjects = state.layerState.objects as CanvasImage[];
+      //Get object equals to id
+      const imageId = imageObjects.findIndex(
+        (obj) => obj.id === action.payload.id
+      );
+
+      state.layerState.objects[imageId].rotation = action.payload.rotation;
+    },
     setBoundingBoxCoordinates: (state, action: PayloadAction<Vector2d>) => {
       state.boundingBoxCoordinates = floorCoordinates(action.payload);
+    },
+    setImageCoordinates: (state, action) => {
+      const imageObjects = state.layerState.objects as CanvasImage[];
+      //Get object equals to id
+      const imageId = imageObjects.findIndex(
+        (obj) => obj.id === action.payload.id
+      );
+
+      state.layerState.objects[imageId].x = action.payload.x;
+      state.layerState.objects[imageId].y = action.payload.y;
+    },
+    setSelectedImage: (state, action) => {
+      for (let i = 0; i < state.layerState.objects.length; i++) {
+        if (state.layerState.objects[i].id === action.payload.id) {
+          state.layerState.objects[i].isSelected = !state.layerState.objects[i].isSelected
+          state.layerState.selectedImageIndex = i;
+        } else {
+          state.layerState.objects[i].isSelected = false
+        }
+      }
+    },
+    deleteSelectedImage: (state) => {
+      state.pastLayerStates.push(_.cloneDeep(state.layerState));
+      state.layerState.objects = state.layerState.objects.filter(
+        (obj, index) => index !== state.layerState.selectedImageIndex
+      );
     },
     setStageCoordinates: (state, action: PayloadAction<Vector2d>) => {
       state.stageCoordinates = action.payload;
@@ -314,6 +360,8 @@ export const canvasSlice = createSlice({
       state.layerState.stagingArea.images.push({
         kind: 'image',
         layer: 'base',
+        id: uuidv4(),
+        angle: 0,
         ...boundingBox,
         image,
       });
@@ -820,8 +868,64 @@ export const canvasSlice = createSlice({
       state.isMovingBoundingBox = false;
       state.isTransformingBoundingBox = false;
     },
+
+    dragEnd: (state) => {
+      console.log('dragEnd');
+      state.pastLayerStates.push(_.cloneDeep(state.layerState));
+    },
+
+    transformEnd: (state) => {
+      console.log('transformEnd');
+      state.pastLayerStates.push(_.cloneDeep(state.layerState));
+    },
+
+
   },
 });
+
+export const removeBackground = (objects, selectedImageIndex) => {
+  const imageObjects = objects as CanvasImage[];
+  const selectedIndex = selectedImageIndex;
+
+  const path = imageObjects[selectedIndex].image.url;
+  console.log(path);
+
+  return async (dispatch) => {
+    fetch('http://brainy.local:8000/remove-bg', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        input_path: path,
+      }),
+    }).then((response) => {
+      response.json().then((data) => {
+        console.log(data.output_url);
+        const img = {
+          uuid: uuidv4(),
+          category: 'temp',
+          url: data.output_url,
+          thumbnail: '',
+          mtime: 0,
+          width: 512,
+          height: 512,
+        };
+        dispatch(
+          addImageToStagingArea({
+            image:img,
+            boundingBox: {x: 0, y: 1024, width: img.width, height: img.height},
+          })
+        );
+      });
+    });
+
+
+
+  }
+}
+
+
 
 export const {
   addEraseRect,
@@ -845,7 +949,11 @@ export const {
   resizeAndScaleCanvas,
   resizeCanvas,
   setBoundingBoxCoordinates,
+  setImageCoordinates,
+  setSelectedImage,
   setBoundingBoxDimensions,
+  setImageDimensions,
+  setImageRotation,
   setBoundingBoxPreviewFill,
   setBoundingBoxScaleMethod,
   setBrushColor,
@@ -891,6 +999,9 @@ export const {
   undo,
   setScaledBoundingBoxDimensions,
   setShouldRestrictStrokesToBox,
+  deleteSelectedImage,
+  dragEnd,
+  transformEnd,
 } = canvasSlice.actions;
 
 export default canvasSlice.reducer;

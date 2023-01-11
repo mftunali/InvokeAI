@@ -195,13 +195,13 @@ const IAICanvasToolChooserOptions = () => {
         isDisabled={isStaging}
         onClick={handleSelectEraserTool}
       />
-      <IAIIconButton
-        aria-label={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}
-        tooltip={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}
-        icon={<FaFillDrip />}
-        isDisabled={isStaging}
-        onClick={handleFillRect}
-      />
+      {/*<IAIIconButton*/}
+      {/*  aria-label={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}*/}
+      {/*  tooltip={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}*/}
+      {/*  icon={<FaFillDrip />}*/}
+      {/*  isDisabled={isStaging}*/}
+      {/*  onClick={handleFillRect}*/}
+      {/*/>*/}
       <IAIIconButton
         aria-label={`${t('unifiedcanvas:eraseBoundingBox')} (Del/Backspace)`}
         tooltip={`${t('unifiedcanvas:eraseBoundingBox')} (Del/Backspace)`}

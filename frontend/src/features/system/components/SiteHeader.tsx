@@ -32,7 +32,7 @@ const SiteHeader = () => {
       <div className="site-header-left-side">
         <img src={InvokeAILogo} alt="invoke-ai-logo" />
         <h1>
-          invoke <strong>ai</strong>
+          Upily<strong>AI</strong>
         </h1>
       </div>
 

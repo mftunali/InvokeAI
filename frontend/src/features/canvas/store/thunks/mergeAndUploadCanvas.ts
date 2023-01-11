@@ -14,7 +14,7 @@ import {
   setProcessingIndeterminateTask,
 } from 'features/system/store/systemSlice';
 import { addImage } from 'features/gallery/store/gallerySlice';
-import { setMergedCanvas } from '../canvasSlice';
+import {addImageToStagingArea, setMergedCanvas} from '../canvasSlice';
 import { CanvasState } from '../canvasTypes';
 import i18n from 'i18n';
 
@@ -25,6 +25,7 @@ type MergeAndUploadCanvasConfig = {
   shouldDownload?: boolean;
   shouldCopy?: boolean;
   shouldSetAsInitialImage?: boolean;
+  shouldAddToStagingArea?: boolean;
 };
 
 const defaultConfig: MergeAndUploadCanvasConfig = {
@@ -34,6 +35,7 @@ const defaultConfig: MergeAndUploadCanvasConfig = {
   shouldDownload: false,
   shouldCopy: false,
   shouldSetAsInitialImage: true,
+  shouldAddToStagingArea: false,
 };
 
 export const mergeAndUploadCanvas =
@@ -46,6 +48,7 @@ export const mergeAndUploadCanvas =
       shouldDownload,
       shouldCopy,
       shouldSetAsInitialImage,
+      shouldAddToStagingArea,
     } = config;
 
     dispatch(setProcessingIndeterminateTask('Exporting Image'));
@@ -162,6 +165,15 @@ export const mergeAndUploadCanvas =
           status: 'success',
           duration: 2500,
           isClosable: true,
+        })
+      );
+    }
+
+    if (shouldAddToStagingArea) {
+      dispatch(
+        addImageToStagingArea({
+          image:newImage,
+          boundingBox: {x: 0, y: 1024, width: newImage.width, height: newImage.height},
         })
       );
     }

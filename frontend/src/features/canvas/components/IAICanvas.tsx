@@ -156,7 +156,7 @@ const IAICanvas = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
+          // onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           onContextMenu={(e: KonvaEventObject<MouseEvent>) =>
             e.evt.preventDefault()
@@ -171,8 +171,7 @@ const IAICanvas = () => {
           <Layer
             id={'base'}
             ref={canvasBaseLayerRefCallback}
-            listening={false}
-            imageSmoothingEnabled={false}
+            listening={true}
           >
             <IAICanvasObjectRenderer />
           </Layer>

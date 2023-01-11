@@ -12,6 +12,7 @@ import {
   setShowDualDisplay,
 } from 'features/options/store/optionsSlice';
 import {
+  addImageToStagingArea,
   setDoesCanvasNeedScaling,
   setInitialCanvasImage,
 } from 'features/canvas/store/canvasSlice';
@@ -67,7 +68,11 @@ const InvokeWorkarea = (props: InvokeWorkareaProps) => {
     if (activeTabName === 'img2img') {
       dispatch(setInitialImage(image));
     } else if (activeTabName === 'unifiedCanvas') {
-      dispatch(setInitialCanvasImage(image));
+      // dispatch(setInitialCanvasImage(image));
+      dispatch(addImageToStagingArea({
+        image:image,
+        boundingBox: {x: 0, y: 1024, width: image.width, height: image.height},
+      }));
     }
   };
 

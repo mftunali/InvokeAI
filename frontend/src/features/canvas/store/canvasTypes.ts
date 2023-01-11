@@ -33,11 +33,14 @@ export type Dimensions = {
 export type CanvasImage = {
   kind: 'image';
   layer: 'base';
+  id: string;
   x: number;
   y: number;
   width: number;
   height: number;
+  rotation: number;
   image: InvokeAI.Image;
+  isSelected: false;
 };
 
 export type CanvasMaskLine = {
@@ -87,6 +90,7 @@ export type CanvasObject =
 
 export type CanvasLayerState = {
   objects: CanvasObject[];
+  selectedImageIndex: number;
   stagingArea: {
     images: CanvasImage[];
     selectedImageIndex: number;

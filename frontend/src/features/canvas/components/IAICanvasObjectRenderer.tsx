@@ -35,11 +35,19 @@ const IAICanvasObjectRenderer = () => {
   if (!objects) return null;
 
   return (
-    <Group name="outpainting-objects" listening={false}>
+    <Group name="outpainting-objects">
       {objects.map((obj, i) => {
         if (isCanvasBaseImage(obj)) {
           return (
-            <IAICanvasImage key={i} x={obj.x} y={obj.y} url={obj.image.url} />
+            <IAICanvasImage key={i}
+                            x={obj.x}
+                            y={obj.y}
+                            url={obj.image.url}
+                            id={obj.id}
+                            width={obj.width}
+                            height={obj.height}
+                            rotation={obj.rotation}
+                            isSelected={obj.isSelected}/>
           );
         } else if (isCanvasBaseLine(obj)) {
           const line = (

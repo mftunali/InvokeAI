@@ -234,3 +234,8 @@ invokeai
 
 # no longer stored in source directory
 models
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/InvokeAI.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
