@@ -7,7 +7,10 @@ import {
   setImageCoordinates,
   setImageRotation,
   setSelectedImage,
-  dragEnd, transformEnd, setBoundingBoxCoordinates
+  dragEnd,
+  transformEnd,
+  setIsMovingImage,
+  setIsTransformingImage
 } from "../store/canvasSlice";
 import {roundDownToMultiple, roundToMultiple} from "../../../common/util/roundDownToMultiple";
 
@@ -23,10 +26,12 @@ const boundingBoxPreviewSelector = createSelector(
   (canvas) => {
     const {
       shouldSnapToGrid,
+      stageCoordinates,
     } = canvas;
 
     return {
       shouldSnapToGrid,
+      stageCoordinates,
     };
   },
   {
@@ -57,6 +62,7 @@ const IAICanvasImage = (props: IAICanvasImageProps) => {
   const dispatch = useAppDispatch();
     const {
       shouldSnapToGrid,
+      stageCoordinates,
     } = useAppSelector(boundingBoxPreviewSelector);
 
 
@@ -177,20 +183,38 @@ const IAICanvasImage = (props: IAICanvasImageProps) => {
 
   const handleOnDragEnd = useCallback(
     (e: KonvaEventObject<DragEvent>) => {
-      dispatch(
-        dragEnd()
-      );
+      dispatch(dragEnd());
+      dispatch(setIsTransformingImage(false));
+      dispatch(setIsMovingImage(false));
       return;
     },
     [dispatch]
   );
 
 
+  const handleStartedTransforming = () => {
+    dispatch(setIsTransformingImage(true));
+  };
+
   const handleOnTransformEnd = useCallback(
     (e: KonvaEventObject<DragEvent>) => {
-      dispatch(
-        transformEnd()
-      );
+      dispatch(transformEnd());
+      dispatch(setIsTransformingImage(false));
+      dispatch(setIsMovingImage(false));
+      return;
+    },
+    [dispatch]
+  );
+
+  const handleEndedModifying = () => {
+    dispatch(setIsTransformingImage(false));
+    dispatch(setIsMovingImage(false));
+  };
+
+
+  const handleStartedMoving = useCallback(
+    (e: KonvaEventObject<DragEvent>) => {
+      dispatch(setIsMovingImage(true));
       return;
     },
     [dispatch]
@@ -205,12 +229,15 @@ const IAICanvasImage = (props: IAICanvasImageProps) => {
       rotation={rotation}
       image={image}
       listening={true}
-      draggable={true}
-      onDragMove={handleOnDragMove2}
+      draggable={isSelected}
+      onDragStart={handleStartedMoving}
       onDragEnd={handleOnDragEnd}
+      onDragMove={handleOnDragMove2}
+      onMouseDown={handleStartedTransforming}
       onClick={handleOnClick}
-      onTransform={handleOnTransform}
-      onTransformEnd={handleOnTransformEnd}
+      onMouseUp={handleEndedModifying}
+      // onTransform={handleOnTransform}
+      // onTransformEnd={handleOnTransformEnd}
       ref={shapeRef}
     />
     {isSelected && <Transformer

@@ -15,11 +15,13 @@ import {
 const selector = createSelector(
   [canvasSelector, isStagingSelector],
   (canvas, isStaging) => {
-    const { tool, isMovingBoundingBox } = canvas;
+    const { tool, isMovingBoundingBox, isMovingImage, isTransformingImage } = canvas;
     return {
       tool,
       isStaging,
       isMovingBoundingBox,
+      isMovingImage,
+      isModifyingImage: isTransformingImage || isMovingImage,
     };
   },
   { memoizeOptions: { resultEqualityCheck: _.isEqual } }
@@ -27,29 +29,28 @@ const selector = createSelector(
 
 const useCanvasDrag = () => {
   const dispatch = useAppDispatch();
-  const { tool, isStaging, isMovingBoundingBox } = useAppSelector(selector);
+  const { tool, isStaging, isMovingBoundingBox, isMovingImage, isModifyingImage } = useAppSelector(selector);
 
   return {
     handleDragStart: useCallback(() => {
-      if (!((tool === 'move' || isStaging) && !isMovingBoundingBox)) return;
+      if (!((tool === 'move' || isStaging) && !isMovingBoundingBox && !isModifyingImage)) return;
       dispatch(setIsMovingStage(true));
-    }, [dispatch, isMovingBoundingBox, isStaging, tool]),
+    }, [dispatch, isMovingBoundingBox, isModifyingImage, isStaging, tool]),
 
     handleDragMove: useCallback(
       (e: KonvaEventObject<MouseEvent>) => {
-        if (!((tool === 'move' || isStaging) && !isMovingBoundingBox)) return;
-
+        if (!((tool === 'move' || isStaging) && !isMovingBoundingBox && !isModifyingImage)) return;
         const newCoordinates = { x: e.target.x(), y: e.target.y() };
 
         dispatch(setStageCoordinates(newCoordinates));
       },
-      [dispatch, isMovingBoundingBox, isStaging, tool]
+      [dispatch, isMovingBoundingBox, isModifyingImage, isStaging, tool]
     ),
 
     handleDragEnd: useCallback(() => {
-      if (!((tool === 'move' || isStaging) && !isMovingBoundingBox)) return;
+      if (!((tool === 'move' || isStaging) && !isMovingBoundingBox && !isModifyingImage)) return;
       dispatch(setIsMovingStage(false));
-    }, [dispatch, isMovingBoundingBox, isStaging, tool]),
+    }, [dispatch, isMovingBoundingBox, isModifyingImage, isStaging, tool]),
   };
 };
 

@@ -41,8 +41,10 @@ const selector = createSelector(
       stageScale,
       shouldShowBoundingBox,
       isTransformingBoundingBox,
+      isTransformingImage,
       isMouseOverBoundingBox,
       isMovingBoundingBox,
+      isMovingImage,
       stageDimensions,
       stageCoordinates,
       tool,
@@ -69,6 +71,7 @@ const selector = createSelector(
     return {
       isMaskEnabled,
       isModifyingBoundingBox: isTransformingBoundingBox || isMovingBoundingBox,
+      isModifyingImage: isTransformingImage || isMovingImage,
       shouldShowBoundingBox,
       shouldShowGrid,
       stageCoordinates,
@@ -91,6 +94,7 @@ const IAICanvas = () => {
   const {
     isMaskEnabled,
     isModifyingBoundingBox,
+    isModifyingImage,
     shouldShowBoundingBox,
     shouldShowGrid,
     stageCoordinates,
@@ -156,13 +160,13 @@ const IAICanvas = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onDragStart={handleDragStart}
-          // onDragMove={handleDragMove}
+          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           onContextMenu={(e: KonvaEventObject<MouseEvent>) =>
             e.evt.preventDefault()
           }
           onWheel={handleWheel}
-          draggable={(tool === 'move' || isStaging) && !isModifyingBoundingBox}
+          draggable={(tool === 'move' || isStaging) && !isModifyingBoundingBox && !isModifyingImage}
         >
           <Layer id={'grid'} visible={shouldShowGrid}>
             <IAICanvasGrid />

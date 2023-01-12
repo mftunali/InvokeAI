@@ -350,8 +350,14 @@ export const canvasSlice = createSlice({
     setIsTransformingBoundingBox: (state, action: PayloadAction<boolean>) => {
       state.isTransformingBoundingBox = action.payload;
     },
+    setIsTransformingImage: (state, action: PayloadAction<boolean>) => {
+      state.isTransformingImage = action.payload;
+    },
     setIsMovingBoundingBox: (state, action: PayloadAction<boolean>) => {
       state.isMovingBoundingBox = action.payload;
+    },
+    setIsMovingImage: (state, action: PayloadAction<boolean>) => {
+      state.isMovingImage = action.payload;
     },
     setIsMouseOverBoundingBox: (state, action: PayloadAction<boolean>) => {
       state.isMouseOverBoundingBox = action.payload;
@@ -892,12 +898,10 @@ export const canvasSlice = createSlice({
     },
 
     dragEnd: (state) => {
-      console.log('dragEnd');
       state.pastLayerStates.push(_.cloneDeep(state.layerState));
     },
 
     transformEnd: (state) => {
-      console.log('transformEnd');
       state.pastLayerStates.push(_.cloneDeep(state.layerState));
     },
 
@@ -992,8 +996,10 @@ export const {
   setIsMoveBoundingBoxKeyHeld,
   setIsMoveStageKeyHeld,
   setIsMovingBoundingBox,
+  setIsMovingImage,
   setIsMovingStage,
   setIsTransformingBoundingBox,
+  setIsTransformingImage,
   setLayer,
   setMaskColor,
   setMergedCanvas,

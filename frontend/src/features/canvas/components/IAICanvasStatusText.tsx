@@ -89,6 +89,11 @@ const IAICanvasStatusText = () => {
           color: activeLayerColor,
         }}
       >{`${t('unifiedcanvas:activeLayer')}: ${activeLayerString}`}</div>
+      <div
+        style={{
+          color: activeLayerColor,
+        }}
+      >{`coord: ${canvasCoordinatesString}`}</div>
       <div>{`${t('unifiedcanvas:canvasScale')}: ${canvasScaleString}%`}</div>
       {shouldShowBoundingBox && (
         <div

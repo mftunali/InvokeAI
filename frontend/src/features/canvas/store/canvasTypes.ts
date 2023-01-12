@@ -138,8 +138,11 @@ export interface CanvasState {
   isMoveBoundingBoxKeyHeld: boolean;
   isMoveStageKeyHeld: boolean;
   isMovingBoundingBox: boolean;
+
+  isMovingImage: boolean;
   isMovingStage: boolean;
   isTransformingBoundingBox: boolean;
+  isTransformingImage: boolean;
   layer: CanvasLayer;
   layerState: CanvasLayerState;
   maskColor: RgbaColor;

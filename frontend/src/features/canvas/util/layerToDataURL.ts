@@ -34,6 +34,12 @@ const layerToDataURL = (
         height: Math.round(height),
       };
 
+  console.log('tempScale', tempScale);
+  console.log('relativeClientRect', relativeClientRect);
+  console.log('boundingBox', boundingBox);
+  // console.log('stageCoordinates', stageCoordinates);
+  // console.log('dataURLBoundingBox', dataURLBoundingBox);
+
   const dataURL = layer.toDataURL(dataURLBoundingBox);
 
   // Unscale the canvas
