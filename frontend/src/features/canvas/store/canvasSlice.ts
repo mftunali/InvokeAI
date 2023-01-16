@@ -945,13 +945,49 @@ export const removeBackground = (objects, selectedImageIndex) => {
         );
       });
     });
-
-
-
   }
 }
 
 
+export const saveToUpilyGallery = (objects, selectedImageIndex) => {
+  const imageObjects = objects as CanvasImage[];
+  const image = imageObjects[selectedImageIndex].image;
+  console.log(image.url);
+
+  return async (dispatch) => {
+    fetch('http://brainy.local:8000/users/image/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image: {
+          url: image.url,
+          thumbnail: image.thumbnail,
+          drive_image_id: "",
+          drive_thumbnail_id: "",
+          prompt_id: 0,
+          width: image.width,
+          height: image.height,
+          token: uuidv4(),
+          user_id: 1,
+        },
+        prompt: {
+          prompt: (image.metadata?.image?.prompt[0]?.prompt)? image.metadata?.image?.prompt[0]?.prompt : "",
+          model: (image.metadata?.model_weights)? image.metadata?.model_weights : "",
+          seed: (image.metadata?.image?.seed)? image.metadata?.image?.seed : 0,
+          step: (image.metadata?.image?.steps)? image.metadata?.image?.steps : 0,
+          cfg: (image.metadata?.image?.cfg_scale)? image.metadata?.image?.cfg_scale : 0.0,
+          sampler: (image.metadata?.image?.sampler)? image.metadata?.image?.sampler : "",
+        }
+      }),
+    }).then((response) => {
+      response.json().then((data) => {
+        console.log(data);
+      });
+    });
+  }
+}
 
 export const {
   addEraseRect,

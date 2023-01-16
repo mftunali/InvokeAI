@@ -4,6 +4,7 @@ import {
   bringForward,
   deleteSelectedImage,
   removeBackground,
+  saveToUpilyGallery,
   resetCanvas,
   resetCanvasView,
   resizeAndScaleCanvas, sendBackward,
@@ -267,6 +268,12 @@ const IAICanvasOutpaintingControls = () => {
     );
   };
 
+  const handleSaveToUpilyGallery = () => {
+    dispatch(
+      saveToUpilyGallery(objects, selectedImageIndex)
+    );
+  };
+
   const handleDeleteObject = () => {
     dispatch(
       deleteSelectedImage()
@@ -404,6 +411,13 @@ const IAICanvasOutpaintingControls = () => {
         </ButtonGroup>
 
         <ButtonGroup isAttached>
+          <IAIIconButton
+            aria-label={`${t('common:saveToUpilyGallery')}`}
+            tooltip={`${t('common:saveToUpilyGallery')}`}
+            icon={<FaSave />}
+            onClick={handleSaveToUpilyGallery}
+            isDisabled={isStaging}
+          />
           <IAIIconButton
             aria-label={`${t('common:bg')}`}
             tooltip={`${t('common:bg')}`}
