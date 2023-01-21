@@ -38,9 +38,6 @@ export default function UnifiedCanvasProcessingButtons() {
       <Flex>
         <InvokeButton iconButton />
       </Flex>
-      <Flex>
-        <CancelButton width={'100%'} height={'40px'} />
-      </Flex>
     </Flex>
   );
 }

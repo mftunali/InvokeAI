@@ -32,6 +32,7 @@ import {
 } from '../util/konvaInstanceProvider';
 import { KonvaEventObject } from 'konva/lib/Node';
 import IAICanvasBoundingBoxOverlay from './IAICanvasBoundingBoxOverlay';
+import IAICanvasAreaToolbar from "./IAICanvasToolbar/IAICanvasAreaToolbar";
 
 const selector = createSelector(
   [canvasSelector, isStagingSelector],
@@ -201,6 +202,7 @@ const IAICanvas = () => {
           </Layer>
         </Stage>
         <IAICanvasStatusText />
+        <IAICanvasAreaToolbar />
         <IAICanvasStagingAreaToolbar />
       </div>
     </div>

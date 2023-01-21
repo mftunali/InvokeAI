@@ -27,6 +27,13 @@ import {
 } from './canvasTypes';
 
 import {v4 as uuidv4} from 'uuid';
+import {
+  setCurrentStatus,
+  setIsCancelable,
+  setIsProcessing,
+  setProcessingIndeterminateTask
+} from "../../system/store/systemSlice";
+import i18n from "../../../i18n";
 
 export const initialLayerState: CanvasLayerState = {
   objects: [],
@@ -917,6 +924,9 @@ export const removeBackground = (objects, selectedImageIndex) => {
   console.log(path);
 
   return async (dispatch) => {
+    dispatch(setProcessingIndeterminateTask('Rwmoving Image Background'));
+    dispatch(setIsCancelable(false));
+
     fetch('http://brainy.local:8000/remove-bg', {
       method: 'POST',
       headers: {
@@ -943,6 +953,10 @@ export const removeBackground = (objects, selectedImageIndex) => {
             boundingBox: {x: 0, y: 1024, width: img.width, height: img.height},
           })
         );
+
+        dispatch(setIsProcessing(false));
+        dispatch(setCurrentStatus(i18n.t('common:statusConnected')));
+        dispatch(setIsCancelable(true));
       });
     });
   }
@@ -955,6 +969,9 @@ export const saveToUpilyGallery = (objects, selectedImageIndex) => {
   console.log(image.url);
 
   return async (dispatch) => {
+    dispatch(setProcessingIndeterminateTask('Uploading Image'));
+    dispatch(setIsCancelable(false));
+
     fetch('http://brainy.local:8000/users/image/', {
       method: 'POST',
       headers: {
@@ -984,6 +1001,9 @@ export const saveToUpilyGallery = (objects, selectedImageIndex) => {
     }).then((response) => {
       response.json().then((data) => {
         console.log(data);
+        dispatch(setIsProcessing(false));
+        dispatch(setCurrentStatus(i18n.t('common:statusConnected')));
+        dispatch(setIsCancelable(true));
       });
     });
   }

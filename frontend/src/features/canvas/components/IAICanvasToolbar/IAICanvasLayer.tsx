@@ -47,6 +47,8 @@ import {
 import {ChangeEvent, useCallback} from 'react';
 import { useTranslation } from 'react-i18next';
 import {KonvaEventObject} from "konva/lib/Node";
+import IAICanvasLayerObject from "./IAICanvasLayerObject";
+import IAICanvasLayerObjects from "./IAICanvasLayerObjects";
 
 export const selector = createSelector(
   [systemSelector, canvasSelector, isStagingSelector],
@@ -89,7 +91,7 @@ const layerSelector = createSelector(
 );
 
 
-const IAICanvasOutpaintingControls = () => {
+const IAICanvasLayerControls = () => {
   const dispatch = useAppDispatch();
   const {
     isProcessing,
@@ -319,28 +321,23 @@ const IAICanvasOutpaintingControls = () => {
   );
 
   return (
-    <Flex flexDirection={'column'} columnGap="1rem" rowGap="1rem" width="2rem" paddingRight={'2.5rem'}>
+    <Flex flexDirection={'column'} columnGap="1rem" rowGap="1rem" width="10rem" paddingRight={'1rem'}>
+      <Flex flexDirection={'row'} columnGap="0.2rem" rowGap="1rem">
+      <IAISelect
+        tooltip={`${t('unifiedcanvas:layer')} (Q)`}
+        tooltipProps={{ hasArrow: true, placement: 'top' }}
+        value={layer}
+        validValues={LAYER_NAMES_DICT}
+        onChange={handleChangeLayer}
+        isDisabled={isStaging}
+      />
 
-      <IAICanvasToolChooserOptions />
+      <IAICanvasMaskOptions />
+      </Flex>
 
-
-          <IAIIconButton
-            aria-label={`${t('common:saveToUpilyGallery')}`}
-            tooltip={`${t('common:saveToUpilyGallery')}`}
-            icon={<FaSave />}
-            onClick={handleSaveToUpilyGallery}
-            isDisabled={isStaging}
-          />
-          <IAIIconButton
-            aria-label={`${t('common:bg')}`}
-            tooltip={`${t('common:bg')}`}
-            icon={<FaUserCheck />}
-            onClick={handleRemoveBackground}
-            isDisabled={isStaging}
-          />
-
+      <IAICanvasLayerObjects />
     </Flex>
   );
 };
 
-export default IAICanvasOutpaintingControls;
+export default IAICanvasLayerControls;

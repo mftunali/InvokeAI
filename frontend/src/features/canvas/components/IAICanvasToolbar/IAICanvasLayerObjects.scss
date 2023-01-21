@@ -1,0 +1,8 @@
+@use '../../../../styles/Mixins/' as *;
+
+
+.layer-objects-container {
+  overflow-y: scroll;
+  max-height: 35rem;
+  @include HideScrollbar;
+}

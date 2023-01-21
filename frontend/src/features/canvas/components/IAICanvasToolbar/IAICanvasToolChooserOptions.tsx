@@ -178,7 +178,7 @@ const IAICanvasToolChooserOptions = () => {
   const handleEraseBoundingBox = () => dispatch(addEraseRect());
 
   return (
-    <ButtonGroup isAttached>
+    <>
       <IAIIconButton
         aria-label={`${t('unifiedcanvas:brush')} (B)`}
         tooltip={`${t('unifiedcanvas:brush')} (B)`}
@@ -195,13 +195,13 @@ const IAICanvasToolChooserOptions = () => {
         isDisabled={isStaging}
         onClick={handleSelectEraserTool}
       />
-      {/*<IAIIconButton*/}
-      {/*  aria-label={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}*/}
-      {/*  tooltip={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}*/}
-      {/*  icon={<FaFillDrip />}*/}
-      {/*  isDisabled={isStaging}*/}
-      {/*  onClick={handleFillRect}*/}
-      {/*/>*/}
+      <IAIIconButton
+        aria-label={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}
+        tooltip={`${t('unifiedcanvas:fillBoundingBox')} (Shift+F)`}
+        icon={<FaFillDrip />}
+        isDisabled={isStaging}
+        onClick={handleFillRect}
+      />
       <IAIIconButton
         aria-label={`${t('unifiedcanvas:eraseBoundingBox')} (Del/Backspace)`}
         tooltip={`${t('unifiedcanvas:eraseBoundingBox')} (Del/Backspace)`}
@@ -209,52 +209,7 @@ const IAICanvasToolChooserOptions = () => {
         isDisabled={isStaging}
         onClick={handleEraseBoundingBox}
       />
-      <IAIIconButton
-        aria-label={`${t('unifiedcanvas:colorPicker')} (C)`}
-        tooltip={`${t('unifiedcanvas:colorPicker')} (C)`}
-        icon={<FaEyeDropper />}
-        data-selected={tool === 'colorPicker' && !isStaging}
-        isDisabled={isStaging}
-        onClick={handleSelectColorPickerTool}
-      />
-      <IAIPopover
-        trigger="hover"
-        triggerComponent={
-          <IAIIconButton
-            aria-label={t('unifiedcanvas:brushOptions')}
-            tooltip={t('unifiedcanvas:brushOptions')}
-            icon={<FaSlidersH />}
-          />
-        }
-      >
-        <Flex
-          minWidth={'15rem'}
-          direction={'column'}
-          gap={'1rem'}
-          width={'100%'}
-        >
-          <Flex gap={'1rem'} justifyContent="space-between">
-            <IAISlider
-              label={t('unifiedcanvas:brushSize')}
-              value={brushSize}
-              withInput
-              onChange={(newSize) => dispatch(setBrushSize(newSize))}
-              sliderNumberInputProps={{ max: 500 }}
-              inputReadOnly={false}
-            />
-          </Flex>
-          <IAIColorPicker
-            style={{
-              width: '100%',
-              paddingTop: '0.5rem',
-              paddingBottom: '0.5rem',
-            }}
-            color={brushColor}
-            onChange={(newColor) => dispatch(setBrushColor(newColor))}
-          />
-        </Flex>
-      </IAIPopover>
-    </ButtonGroup>
+    </>
   );
 };
 

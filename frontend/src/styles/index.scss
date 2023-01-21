@@ -63,6 +63,9 @@
 @use '../common/components/WorkInProgress/WorkInProgress.scss';
 @use '../common/components/GuidePopover.scss';
 
+//custom imports
+@use '../features/canvas/components/IAICanvasToolbar/IAICanvasLayerObjects.scss';
+
 // Component Shared - Radix UI
 // @use 'common/components/radix-ui/IAISlider.scss';
 // @use 'common/components/radix-ui/IAITooltip.scss';

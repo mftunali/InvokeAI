@@ -2,7 +2,7 @@
 
 .floating-show-hide-button {
   position: absolute;
-  top: 50%;
+  top: 8rem;
   transform: translate(0, -50%);
   z-index: 20;
   padding: 0;
@@ -20,7 +20,7 @@
 
   @include Button(
     $btn-width: 2rem,
-    $btn-height: 12rem,
+    $btn-height: 5rem,
     $icon-size: 20px,
     $btn-color: var(--btn-btn-base-color),
     $btn-color-hover: var(--btn-btn-base-color-hover)

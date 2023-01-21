@@ -89,7 +89,7 @@ const layerSelector = createSelector(
 );
 
 
-const IAICanvasOutpaintingControls = () => {
+const IAICanvasAreaToolbar = () => {
   const dispatch = useAppDispatch();
   const {
     isProcessing,
@@ -319,28 +319,90 @@ const IAICanvasOutpaintingControls = () => {
   );
 
   return (
-    <Flex flexDirection={'column'} columnGap="1rem" rowGap="1rem" width="2rem" paddingRight={'2.5rem'}>
+    <div className="canvas-buttons-group">
+    <Flex flexDirection={'row'} columnGap="1rem" rowGap="1rem" width="6rem">
 
-      <IAICanvasToolChooserOptions />
+
+      <ButtonGroup isAttached>
+        <IAIIconButton
+          aria-label={`${t('unifiedcanvas:move')} (V)`}
+          tooltip={`${t('unifiedcanvas:move')} (V)`}
+          icon={<FaArrowsAlt />}
+          data-selected={tool === 'move' || isStaging}
+          onClick={handleSelectMoveTool}
+        />
+        <IAIIconButton
+          aria-label={`${t('unifiedcanvas:resetView')} (R)`}
+          tooltip={`${t('unifiedcanvas:resetView')} (R)`}
+          icon={<FaCrosshairs />}
+          onClick={handleResetCanvasView}
+        />
+      </ButtonGroup>
+
+      <ButtonGroup isAttached>
+        <IAICanvasUndoButton />
+        <IAICanvasRedoButton />
+      </ButtonGroup>
 
 
+        <ButtonGroup isAttached>
           <IAIIconButton
-            aria-label={`${t('common:saveToUpilyGallery')}`}
-            tooltip={`${t('common:saveToUpilyGallery')}`}
+            aria-label={`${t('unifiedcanvas:mergeVisible')} (Shift+M)`}
+            tooltip={`${t('unifiedcanvas:mergeVisible')} (Shift+M)`}
+            icon={<FaLayerGroup />}
+            onClick={handleMergeVisible}
+            isDisabled={isStaging}
+          />
+          <IAIIconButton
+            aria-label={`${t('unifiedcanvas:saveToGallery')} (Shift+S)`}
+            tooltip={`${t('unifiedcanvas:saveToGallery')} (Shift+S)`}
             icon={<FaSave />}
-            onClick={handleSaveToUpilyGallery}
+            onClick={handleSaveToGallery}
             isDisabled={isStaging}
           />
-          <IAIIconButton
-            aria-label={`${t('common:bg')}`}
-            tooltip={`${t('common:bg')}`}
-            icon={<FaUserCheck />}
-            onClick={handleRemoveBackground}
-            isDisabled={isStaging}
-          />
+
+        <IAIIconButton
+          aria-label={`${t('unifiedcanvas:copyToClipboard')} (Cmd/Ctrl+C)`}
+          tooltip={`${t('unifiedcanvas:copyToClipboard')} (Cmd/Ctrl+C)`}
+          icon={<FaCopy />}
+          onClick={handleCopyImageToClipboard}
+          isDisabled={isStaging}
+        />
+        <IAIIconButton
+          aria-label={`${t('unifiedcanvas:downloadAsImage')} (Shift+D)`}
+          tooltip={`${t('unifiedcanvas:downloadAsImage')} (Shift+D)`}
+          icon={<FaDownload />}
+          onClick={handleDownloadAsImage}
+          isDisabled={isStaging}
+        />
+      </ButtonGroup>
+
+
+      <ButtonGroup isAttached>
+        <IAIIconButton
+          aria-label={`${t('common:upload')}`}
+          tooltip={`${t('common:upload')}`}
+          icon={<FaUpload />}
+          onClick={openUploader}
+          isDisabled={isStaging}
+        />
+        <IAIIconButton
+          aria-label={`${t('unifiedcanvas:clearCanvas')}`}
+          tooltip={`${t('unifiedcanvas:clearCanvas')}`}
+          icon={<FaTrash />}
+          onClick={handleResetCanvas}
+          style={{ backgroundColor: 'var(--btn-delete-image)' }}
+          isDisabled={isStaging}
+        />
+      </ButtonGroup>
+
+      <ButtonGroup isAttached>
+        <IAICanvasSettingsButtonPopover />
+      </ButtonGroup>
 
     </Flex>
+      </div>
   );
 };
 
-export default IAICanvasOutpaintingControls;
+export default IAICanvasAreaToolbar;

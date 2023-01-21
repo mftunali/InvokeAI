@@ -105,27 +105,22 @@ const IAICanvasMaskOptions = () => {
     <IAIPopover
       trigger="hover"
       triggerComponent={
-        <ButtonGroup>
-          <IAIIconButton
-            aria-label={t('unifiedcanvas:maskingOptions')}
-            tooltip={t('unifiedcanvas:maskingOptions')}
-            icon={<FaMask />}
-            style={
-              layer === 'mask'
-                ? { backgroundColor: 'var(--accent-color)' }
-                : { backgroundColor: 'var(--btn-base-color)' }
-            }
-            isDisabled={isStaging}
-          />
-        </ButtonGroup>
+        <IAIIconButton
+          aria-label={t('unifiedcanvas:maskingOptions')}
+          tooltip={t('unifiedcanvas:maskingOptions')}
+          onClick={handleToggleEnableMask}
+          icon={<FaMask />}
+          style={
+            layer === 'mask'
+              ? { backgroundColor: 'var(--accent-color)' }
+              : { backgroundColor: 'var(--btn-base-color)' }
+          }
+          isDisabled={isStaging}
+        />
       }
     >
       <Flex direction={'column'} gap={'0.5rem'}>
-        <IAICheckbox
-          label={`${t('unifiedcanvas:enableMask')} (H)`}
-          isChecked={isMaskEnabled}
-          onChange={handleToggleEnableMask}
-        />
+
         <IAICheckbox
           label={t('unifiedcanvas:preserveMaskedArea')}
           isChecked={shouldPreserveMaskedArea}

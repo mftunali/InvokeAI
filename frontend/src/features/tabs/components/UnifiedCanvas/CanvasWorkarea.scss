@@ -101,3 +101,20 @@
   margin: 0.25rem;
   pointer-events: none;
 }
+
+
+.canvas-buttons-group {
+  position: absolute;
+  top: 0;
+  left: 20rem;
+  right: 20rem;
+  background-color: var(--background-color);
+  opacity: 0.65;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  padding: 0.25rem;
+  min-width: 12rem;
+  border-radius: 0.25rem;
+  margin: 0.25rem;
+}
