@@ -1,17 +1,19 @@
 import importlib
-
-import torch
-import numpy as np
 import math
-from collections import abc
-from einops import rearrange
-from functools import partial
-
 import multiprocessing as mp
-from threading import Thread
-from queue import Queue
-
+from collections import abc
 from inspect import isfunction
+from queue import Queue
+from threading import Thread
+from urllib import request
+from tqdm import tqdm
+from pathlib import Path
+from ldm.invoke.devices import torch_dtype
+
+import numpy as np
+import torch
+import os
+import traceback
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -234,7 +236,8 @@ def rand_perlin_2d(shape, res, device, fade = lambda t: 6*t**5 - 15*t**4 + 10*t*
     n01 = dot(tile_grads([0, -1],[1, None]), [0, -1]).to(device)
     n11 = dot(tile_grads([1, None], [1, None]), [-1,-1]).to(device)
     t = fade(grid[:shape[0], :shape[1]])
-    return math.sqrt(2) * torch.lerp(torch.lerp(n00, n10, t[..., 0]), torch.lerp(n01, n11, t[..., 0]), t[..., 1]).to(device)
+    noise = math.sqrt(2) * torch.lerp(torch.lerp(n00, n10, t[..., 0]), torch.lerp(n01, n11, t[..., 0]), t[..., 1]).to(device)
+    return noise.to(dtype=torch_dtype(device))
 
 def ask_user(question: str, answers: list):
     from itertools import chain, repeat
@@ -250,7 +253,7 @@ def debug_image(debug_image, debug_text, debug_show=True, debug_result=False, de
     if not debug_status:
         return
 
-    image_copy = debug_image.copy()
+    image_copy = debug_image.copy().convert("RGBA")
     ImageDraw.Draw(image_copy).text(
         (5, 5),
         debug_text,
@@ -262,3 +265,32 @@ def debug_image(debug_image, debug_text, debug_show=True, debug_result=False, de
 
     if debug_result:
         return image_copy
+
+#-------------------------------------
+class ProgressBar():
+    def __init__(self,model_name='file'):
+        self.pbar = None
+        self.name = model_name
+
+    def __call__(self, block_num, block_size, total_size):
+        if not self.pbar:
+            self.pbar=tqdm(desc=self.name,
+                           initial=0,
+                           unit='iB',
+                           unit_scale=True,
+                           unit_divisor=1000,
+                           total=total_size)
+        self.pbar.update(block_size)
+
+def download_with_progress_bar(url:str, dest:Path)->bool:
+    try:
+        if not dest.exists():
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            request.urlretrieve(url,dest,ProgressBar(dest.stem))
+            return True
+        else:
+            return True
+    except OSError:
+        print(traceback.format_exc())
+        return False
+

@@ -1,9 +1,12 @@
 import torch
 from torch import autocast
 from contextlib import nullcontext
+from ldm.invoke.globals import Globals
 
 def choose_torch_device() -> str:
     '''Convenience routine for guessing which GPU device to run model on'''
+    if Globals.always_use_cpu:
+        return "cpu"
     if torch.cuda.is_available():
         return 'cuda'
     if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
@@ -17,6 +20,14 @@ def choose_precision(device) -> str:
         if not ('GeForce GTX 1660' in device_name or 'GeForce GTX 1650' in device_name):
             return 'float16'
     return 'float32'
+
+def torch_dtype(device) -> torch.dtype:
+    if Globals.full_precision:
+        return torch.float32
+    if choose_precision(device) == 'float16':
+        return torch.float16
+    else:
+        return torch.float32
 
 def choose_autocast(precision):
     '''Returns an autocast context or nullcontext for the given precision string'''

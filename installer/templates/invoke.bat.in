@@ -9,15 +9,28 @@ set INVOKEAI_ROOT=.
 echo Do you want to generate images using the
 echo 1. command-line
 echo 2. browser-based UI
-echo 3. open the developer console
-set /P restore="Please enter 1, 2 or 3: "
+echo 3. run textual inversion training
+echo 4. merge models (diffusers type only)
+echo 5. re-run the configure script to download new models
+echo 6. open the developer console
+set /P restore="Please enter 1, 2, 3, 4 or 5: [2] "
+if not defined restore set restore=2
 IF /I "%restore%" == "1" (
     echo Starting the InvokeAI command-line..
-    python .venv\Scripts\invoke.py %*
+    python .venv\Scripts\invokeai.exe %*
 ) ELSE IF /I "%restore%" == "2" (
     echo Starting the InvokeAI browser-based UI..
-    python .venv\Scripts\invoke.py --web %*
+    python .venv\Scripts\invokeai.exe --web %*
 ) ELSE IF /I "%restore%" == "3" (
+    echo Starting textual inversion training..
+    python .venv\Scripts\invokeai-ti.exe --gui %*
+) ELSE IF /I "%restore%" == "4" (
+    echo Starting model merging script..
+    python .venv\Scripts\invokeai-merge.exe --gui %*
+) ELSE IF /I "%restore%" == "5" (
+    echo Running invokeai-configure...
+    python .venv\Scripts\invokeai-configure.exe %*
+) ELSE IF /I "%restore%" == "6" (
     echo Developer Console
     echo Python command is:
     where python

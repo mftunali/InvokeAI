@@ -43,9 +43,9 @@ class CFGDenoiser(nn.Module):
         extra_conditioning_info = kwargs.get('extra_conditioning_info', None)
 
         if extra_conditioning_info is not None and extra_conditioning_info.wants_cross_attention_control:
-            self.invokeai_diffuser.setup_cross_attention_control(extra_conditioning_info, step_count = t_enc)
+            self.invokeai_diffuser.override_cross_attention(extra_conditioning_info, step_count = t_enc)
         else:
-            self.invokeai_diffuser.remove_cross_attention_control()
+            self.invokeai_diffuser.restore_default_cross_attention()
 
 
     def forward(self, x, sigma, uncond, cond, cond_scale):
@@ -209,12 +209,12 @@ class KSampler(Sampler):
         model_wrap_cfg.prepare_to_sample(S, extra_conditioning_info=extra_conditioning_info)
 
         # setup attention maps saving. checks for None are because there are multiple code paths to get here.
-        attention_maps_saver = None
+        attention_map_saver = None
         if attention_maps_callback is not None and extra_conditioning_info is not None:
             eos_token_index = extra_conditioning_info.tokens_count_including_eos_bos - 1
             attention_map_token_ids = range(1, eos_token_index)
-            attention_maps_saver = AttentionMapSaver(token_ids = attention_map_token_ids, latents_shape=x.shape[-2:])
-            model_wrap_cfg.invokeai_diffuser.setup_attention_map_saving(attention_maps_saver)
+            attention_map_saver = AttentionMapSaver(token_ids = attention_map_token_ids, latents_shape=x.shape[-2:])
+            model_wrap_cfg.invokeai_diffuser.setup_attention_map_saving(attention_map_saver)
 
         extra_args = {
             'cond': conditioning,
@@ -229,8 +229,8 @@ class KSampler(Sampler):
             ),
             None,
         )
-        if attention_maps_saver is not None:
-            attention_maps_callback(attention_maps_saver)
+        if attention_map_saver is not None:
+            attention_maps_callback(attention_map_saver)
         return sampling_result
 
     # this code will support inpainting if and when ksampler API modified or
