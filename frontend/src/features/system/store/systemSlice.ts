@@ -50,6 +50,7 @@ export interface SystemState
   searchFolder: string | null;
   foundModels: InvokeAI.FoundModel[] | null;
   openModel: string | null;
+  upilyModel: string;
 }
 
 const initialSystemState: SystemState = {
@@ -88,6 +89,7 @@ const initialSystemState: SystemState = {
   searchFolder: null,
   foundModels: null,
   openModel: null,
+  upilyModel: '',
 };
 
 export const systemSlice = createSlice({
@@ -243,6 +245,9 @@ export const systemSlice = createSlice({
     setOpenModel: (state, action: PayloadAction<string | null>) => {
       state.openModel = action.payload;
     },
+    setUpilyModel: (state, action: PayloadAction<string>) => {
+      state.upilyModel = action.payload;
+    },
   },
 });
 
@@ -274,6 +279,7 @@ export const {
   setSearchFolder,
   setFoundModels,
   setOpenModel,
+  setUpilyModel,
 } = systemSlice.actions;
 
 export default systemSlice.reducer;

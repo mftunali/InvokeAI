@@ -10,17 +10,18 @@ import {
   resizeAndScaleCanvas, sendBackward,
   setIsMaskEnabled,
   setLayer, setSelectedImage,
-  setTool,
+  setTool, pixImage, generateUpily,
 } from 'features/canvas/store/canvasSlice';
 import { useAppDispatch, useAppSelector } from 'app/storeHooks';
 import _ from 'lodash';
 import IAIIconButton from 'common/components/IAIIconButton';
 import {
-  FaArrowsAlt, FaBackward,
+  FaArrowAltCircleDown,
+  FaArrowsAlt, FaBackward, FaCircleNotch,
   FaCopy,
   FaCrosshairs,
   FaDownload, FaForward,
-  FaLayerGroup, FaRemoveFormat,
+  FaLayerGroup, FaRegArrowAltCircleUp, FaRemoveFormat,
   FaSave, FaStepBackward, FaStepForward,
   FaTrash,
   FaUpload, FaUserAltSlash, FaUserCheck,
@@ -33,6 +34,7 @@ import { mergeAndUploadCanvas } from 'features/canvas/store/thunks/mergeAndUploa
 import { useHotkeys } from 'react-hotkeys-hook';
 import { getCanvasBaseLayer } from 'features/canvas/util/konvaInstanceProvider';
 import { systemSelector } from 'features/system/store/systemSelectors';
+import { optionsSelector } from 'features/options/store/optionsSelectors';
 import IAICanvasToolChooserOptions from './IAICanvasToolChooserOptions';
 import useImageUploader from 'common/hooks/useImageUploader';
 import {
@@ -47,16 +49,26 @@ import {
 import {ChangeEvent, useCallback} from 'react';
 import { useTranslation } from 'react-i18next';
 import {KonvaEventObject} from "konva/lib/Node";
+import {setSeed, setShouldRandomizeSeed} from "../../../options/store/optionsSlice";
 
 export const selector = createSelector(
-  [systemSelector, canvasSelector, isStagingSelector],
-  (system, canvas, isStaging) => {
-    const { isProcessing } = system;
-    const { tool, shouldCropToBoundingBoxOnSave, layer, isMaskEnabled } =
+  [optionsSelector, systemSelector, canvasSelector, isStagingSelector],
+  (options, system, canvas, isStaging) => {
+    const { isProcessing, upilyModel } = system;
+    const { prompt, cfgScale, steps, sampler, seed, shouldRandomizeSeed } = options;
+    const { tool, shouldCropToBoundingBoxOnSave, layer, isMaskEnabled, boundingBoxCoordinates } =
       canvas;
 
     return {
+      boundingBoxCoordinates,
+      prompt,
+      cfgScale,
+      steps,
+      sampler,
+      seed,
+      shouldRandomizeSeed,
       isProcessing,
+      upilyModel,
       isStaging,
       isMaskEnabled,
       tool,
@@ -92,7 +104,15 @@ const layerSelector = createSelector(
 const IAICanvasOutpaintingControls = () => {
   const dispatch = useAppDispatch();
   const {
+    boundingBoxCoordinates,
+    prompt,
+    cfgScale,
+    steps,
+    sampler,
+    seed,
+    shouldRandomizeSeed,
     isProcessing,
+    upilyModel,
     isStaging,
     isMaskEnabled,
     layer,
@@ -264,7 +284,34 @@ const IAICanvasOutpaintingControls = () => {
 
   const handleRemoveBackground = () => {
     dispatch(
-      removeBackground(objects, selectedImageIndex)
+      removeBackground(objects, selectedImageIndex, boundingBoxCoordinates)
+    );
+  };
+
+  const handlePixImage = () => {
+    dispatch(
+      pixImage(objects, selectedImageIndex, prompt)
+    );
+  };
+
+
+  const handleGenerateUpily = () => {
+    let currentSeed = seed;
+    if(shouldRandomizeSeed){
+      currentSeed = Math.floor(Math.random() * 100000);
+      dispatch(setSeed(currentSeed));
+      dispatch(setShouldRandomizeSeed(true));
+    }
+    const data = {
+      "prompt": prompt,
+      "cfg": cfgScale,
+      "steps": steps,
+      "scheduler": sampler,
+      "seed": currentSeed,
+      "model": upilyModel,
+    }
+    dispatch(
+      generateUpily(data, boundingBoxCoordinates)
     );
   };
 
@@ -336,6 +383,20 @@ const IAICanvasOutpaintingControls = () => {
             tooltip={`${t('common:bg')}`}
             icon={<FaUserCheck />}
             onClick={handleRemoveBackground}
+            isDisabled={isStaging}
+          />
+          <IAIIconButton
+            aria-label={`${t('common:pix')}`}
+            tooltip={`${t('common:pix')}`}
+            icon={<FaCircleNotch />}
+            onClick={handlePixImage}
+            isDisabled={isStaging}
+          />
+          <IAIIconButton
+            aria-label={`${t('common:gen')}`}
+            tooltip={`${t('common:gen')}`}
+            icon={<FaCircleNotch />}
+            onClick={handleGenerateUpily}
             isDisabled={isStaging}
           />
 

@@ -39,8 +39,6 @@ const IAICanvasLayerObjects = () => {
     selectedImageIndex,
   } = useAppSelector(layerSelector);
 
-  console.log(objects);
-
   return (
     <div >
       <Flex flexDirection={'column'} rowGap="0.1rem" className={'layer-objects-container'}>

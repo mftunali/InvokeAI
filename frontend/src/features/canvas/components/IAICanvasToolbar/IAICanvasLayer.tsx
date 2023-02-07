@@ -54,10 +54,12 @@ export const selector = createSelector(
   [systemSelector, canvasSelector, isStagingSelector],
   (system, canvas, isStaging) => {
     const { isProcessing } = system;
-    const { tool, shouldCropToBoundingBoxOnSave, layer, isMaskEnabled } =
+    const { tool, shouldCropToBoundingBoxOnSave, layer, isMaskEnabled, boundingBoxCoordinates, boundingBoxDimensions } =
       canvas;
 
     return {
+      boundingBoxCoordinates,
+      boundingBoxDimensions,
       isProcessing,
       isStaging,
       isMaskEnabled,
@@ -94,6 +96,8 @@ const layerSelector = createSelector(
 const IAICanvasLayerControls = () => {
   const dispatch = useAppDispatch();
   const {
+    boundingBoxCoordinates,
+    boundingBoxDimensions,
     isProcessing,
     isStaging,
     isMaskEnabled,
@@ -266,7 +270,7 @@ const IAICanvasLayerControls = () => {
 
   const handleRemoveBackground = () => {
     dispatch(
-      removeBackground(objects, selectedImageIndex)
+      removeBackground(objects, selectedImageIndex, boundingBoxCoordinates)
     );
   };
 
@@ -321,7 +325,7 @@ const IAICanvasLayerControls = () => {
   );
 
   return (
-    <Flex flexDirection={'column'} columnGap="1rem" rowGap="1rem" width="10rem" paddingRight={'1rem'}>
+    <Flex flexDirection={'column'} columnGap="1rem" rowGap="1rem" width="8.4rem" paddingRight={'1rem'}>
       <Flex flexDirection={'row'} columnGap="0.2rem" rowGap="1rem">
       <IAISelect
         tooltip={`${t('unifiedcanvas:layer')} (Q)`}

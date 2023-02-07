@@ -189,9 +189,11 @@ export const frontendToBackendParameters = (
     generationParameters.strength = img2imgStrength;
     generationParameters.fit = shouldFitToWidthHeight;
   }
-
+  console.log(generationMode);
   // inpainting exclusive parameters
   if (generationMode === 'unifiedCanvas' && canvasBaseLayer) {
+
+    console.log('generating mask');
     const {
       layerState: { objects },
       boundingBoxCoordinates,

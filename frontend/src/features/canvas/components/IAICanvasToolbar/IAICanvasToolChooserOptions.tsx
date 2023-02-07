@@ -188,6 +188,15 @@ const IAICanvasToolChooserOptions = () => {
         isDisabled={isStaging}
       />
       <IAIIconButton
+        aria-label={`${t('unifiedcanvas:colorPicker')} (C)`}
+        tooltip={`${t('unifiedcanvas:colorPicker')} (C)`}
+        icon={<FaEyeDropper />}
+        data-selected={tool === 'colorPicker' && !isStaging}
+        isDisabled={isStaging}
+        onClick={handleSelectColorPickerTool}
+        width={'max-content'}
+      />
+      <IAIIconButton
         aria-label={`${t('unifiedcanvas:eraser')} (E)`}
         tooltip={`${t('unifiedcanvas:eraser')} (E)`}
         icon={<FaEraser />}

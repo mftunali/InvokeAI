@@ -28,12 +28,19 @@ import {
 
 import {v4 as uuidv4} from 'uuid';
 import {
+  generationRequested,
   setCurrentStatus,
   setIsCancelable,
   setIsProcessing,
   setProcessingIndeterminateTask
 } from "../../system/store/systemSlice";
 import i18n from "../../../i18n";
+import {RootState, store} from "../../../app/store";
+import {
+  frontendToBackendParameters,
+  FrontendToBackendParametersConfig
+} from "../../../common/util/parameterTranslation";
+import {InvokeTabName, tabMap} from 'features/tabs/tabMap';
 
 export const initialLayerState: CanvasLayerState = {
   objects: [],
@@ -383,6 +390,8 @@ export const canvasSlice = createSlice({
       }>
     ) => {
       const { boundingBox, image } = action.payload;
+      console.log(boundingBox);
+
 
       if (!boundingBox || !image) return;
 
@@ -916,7 +925,57 @@ export const canvasSlice = createSlice({
   },
 });
 
-export const removeBackground = (objects, selectedImageIndex) => {
+export const removeBackground = (objects, selectedImageIndex, bbox) => {
+  const imageObjects = objects as CanvasImage[];
+  const selectedIndex = selectedImageIndex;
+
+  const image = imageObjects[selectedIndex].image;
+  const path = image.url;
+  console.log(path);
+
+  return async (dispatch) => {
+    dispatch(setProcessingIndeterminateTask('Removing Image Background'));
+    dispatch(setIsCancelable(false));
+
+    console.log(bbox);
+
+    fetch('http://brainy.local:8000/remove-bg', {
+    // fetch('http://localhost:8000/remove-bg', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        input_path: path,
+      }),
+    }).then((response) => {
+      response.json().then((data) => {
+        console.log(data.output_url);
+        const img = {
+          uuid: uuidv4(),
+          category: 'temp',
+          url: data.output_url,
+          thumbnail: '',
+          mtime: 0,
+          width: image.width,
+          height: image.height,
+        };
+        dispatch(
+          addImageToStagingArea({
+            image:img,
+            boundingBox: {x: bbox.x, y: bbox.y, width: img.width, height: img.height},
+          })
+        );
+
+        dispatch(setIsProcessing(false));
+        dispatch(setCurrentStatus(i18n.t('common:statusConnected')));
+        dispatch(setIsCancelable(true));
+      });
+    });
+  }
+}
+
+export const pixImage = (objects, selectedImageIndex, prompt) => {
   const imageObjects = objects as CanvasImage[];
   const selectedIndex = selectedImageIndex;
 
@@ -924,16 +983,18 @@ export const removeBackground = (objects, selectedImageIndex) => {
   console.log(path);
 
   return async (dispatch) => {
-    dispatch(setProcessingIndeterminateTask('Rwmoving Image Background'));
+    dispatch(setProcessingIndeterminateTask('Sending Image to pix2pix'));
     dispatch(setIsCancelable(false));
 
-    fetch('http://brainy.local:8000/remove-bg', {
+    fetch('http://brainy.local:8001/convert', {
+    // fetch('http://localhost:8001/convert', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         input_path: path,
+        prompt: prompt,
       }),
     }).then((response) => {
       response.json().then((data) => {
@@ -973,6 +1034,7 @@ export const saveToUpilyGallery = (objects, selectedImageIndex) => {
     dispatch(setIsCancelable(false));
 
     fetch('http://brainy.local:8000/users/image/', {
+    // fetch('http://localhost:8000/users/image/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1001,6 +1063,84 @@ export const saveToUpilyGallery = (objects, selectedImageIndex) => {
     }).then((response) => {
       response.json().then((data) => {
         console.log(data);
+        dispatch(setIsProcessing(false));
+        dispatch(setCurrentStatus(i18n.t('common:statusConnected')));
+        dispatch(setIsCancelable(true));
+      });
+    });
+  }
+}
+
+
+
+
+export const generateUpily = (data, bbox) => {
+
+  return async (dispatch) => {
+    const { getState } = store;
+
+    const state: RootState = getState();
+
+    const {
+      options: optionsState,
+      system: systemState,
+      canvas: canvasState,
+    } = state;
+
+    const tab = 'unifiedCanvas' as InvokeTabName;
+
+    const frontendToBackendParametersConfig: FrontendToBackendParametersConfig =
+      {
+        generationMode:tab,
+        optionsState,
+        canvasState,
+        systemState,
+      };
+
+    // dispatch(generationRequested());
+
+    const { generationParameters, esrganParameters, facetoolParameters } =
+      frontendToBackendParameters(frontendToBackendParametersConfig);
+
+    console.log(tab)
+    console.log(generationParameters);
+
+    generationParameters['model'] = data.model;
+    delete generationParameters['bounding_box'];
+
+    // dispatch(setProcessingIndeterminateTask('Generating Image'));
+    // dispatch(setIsCancelable(false));
+
+    console.log(generationParameters);
+    console.log(JSON.stringify(generationParameters));
+
+
+    fetch('http://brainy.local:8001/generate', {
+      // fetch('http://localhost:8001/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(generationParameters),
+    }).then((response) => {
+      response.json().then((data) => {
+        console.log(data.output_url);
+        const img = {
+          uuid: uuidv4(),
+          category: 'temp',
+          url: data.output_url,
+          thumbnail: '',
+          mtime: 0,
+          width: generationParameters.width,
+          height: generationParameters.height,
+        };
+        dispatch(
+          addImageToStagingArea({
+            image:img,
+            boundingBox: {x: bbox.x, y: bbox.y, width: img.width, height: img.height},
+          })
+        );
+
         dispatch(setIsProcessing(false));
         dispatch(setCurrentStatus(i18n.t('common:statusConnected')));
         dispatch(setIsCancelable(true));

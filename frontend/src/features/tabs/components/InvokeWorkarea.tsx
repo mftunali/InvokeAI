@@ -18,6 +18,28 @@ import {
 } from 'features/canvas/store/canvasSlice';
 import _ from 'lodash';
 import useGetImageByUuid from 'features/gallery/hooks/useGetImageByUuid';
+import {canvasSelector} from "../../canvas/store/canvasSelectors";
+
+
+const bboxSelector = createSelector(
+  canvasSelector,
+  (canvas) => {
+    const {
+      boundingBoxCoordinates,
+      boundingBoxDimensions,
+    } = canvas;
+
+    return {
+      boundingBoxCoordinates,
+      boundingBoxDimensions,
+    };
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: _.isEqual,
+    },
+  }
+);
 
 const workareaSelector = createSelector(
   [(state: RootState) => state.options, activeTabNameSelector],
@@ -54,6 +76,10 @@ const InvokeWorkarea = (props: InvokeWorkareaProps) => {
     shouldShowDualDisplayButton,
   } = useAppSelector(workareaSelector);
 
+  const {
+    boundingBoxCoordinates,
+  } = useAppSelector(bboxSelector);
+
   const getImageByUuid = useGetImageByUuid();
 
   const handleDualDisplay = () => {
@@ -71,7 +97,7 @@ const InvokeWorkarea = (props: InvokeWorkareaProps) => {
       // dispatch(setInitialCanvasImage(image));
       dispatch(addImageToStagingArea({
         image:image,
-        boundingBox: {x: 0, y: 1024, width: image.width, height: image.height},
+        boundingBox: {x: boundingBoxCoordinates.x, y: boundingBoxCoordinates.y, width: image.width, height: image.height},
       }));
     }
   };

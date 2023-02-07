@@ -52,10 +52,11 @@ export const selector = createSelector(
   [systemSelector, canvasSelector, isStagingSelector],
   (system, canvas, isStaging) => {
     const { isProcessing } = system;
-    const { tool, shouldCropToBoundingBoxOnSave, layer, isMaskEnabled } =
+    const { tool, shouldCropToBoundingBoxOnSave, layer, isMaskEnabled, boundingBoxCoordinates } =
       canvas;
 
     return {
+      boundingBoxCoordinates,
       isProcessing,
       isStaging,
       isMaskEnabled,
@@ -92,6 +93,7 @@ const layerSelector = createSelector(
 const IAICanvasAreaToolbar = () => {
   const dispatch = useAppDispatch();
   const {
+    boundingBoxCoordinates,
     isProcessing,
     isStaging,
     isMaskEnabled,
@@ -264,7 +266,7 @@ const IAICanvasAreaToolbar = () => {
 
   const handleRemoveBackground = () => {
     dispatch(
-      removeBackground(objects, selectedImageIndex)
+      removeBackground(objects, selectedImageIndex, boundingBoxCoordinates)
     );
   };
 

@@ -17,6 +17,7 @@ import LanguagePicker from './LanguagePicker';
 
 import { useTranslation } from 'react-i18next';
 import { MdSettings } from 'react-icons/md';
+import ModelSelectUpily from "./ModelSelectUpily";
 
 /**
  * Header, includes color mode toggle, settings button, status message.
@@ -36,6 +37,7 @@ const SiteHeader = () => {
       <div className="site-header-right-side">
         <StatusIndicator />
 
+        <ModelSelectUpily />
         <ModelSelect />
 
         <ModelManagerModal>
