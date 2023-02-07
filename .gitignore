@@ -238,3 +238,7 @@ models
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+frontend/node_modules/
+frontend/.idea/
+backend/.idea/
+.idea/
