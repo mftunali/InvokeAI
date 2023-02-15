@@ -920,7 +920,7 @@ export const canvasSlice = createSlice({
   },
 });
 
-export const removeBackground = (objects, selectedImageIndex, bbox) => {
+export const removeBackground = (objects, selectedImageIndex, bbox, token) => {
   const imageObjects = objects as CanvasImage[];
   const selectedIndex = selectedImageIndex;
 
@@ -934,11 +934,11 @@ export const removeBackground = (objects, selectedImageIndex, bbox) => {
 
     console.log(bbox);
 
-    fetch('http://brainy.local:8000/remove-bg', {
-    // fetch('http://localhost:8000/remove-bg', {
+    fetch(window.location.origin +'/remove-bg', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
       },
       body: JSON.stringify({
         input_path: path,

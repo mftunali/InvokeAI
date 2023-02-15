@@ -6,8 +6,8 @@ import legacy from '@vitejs/plugin-legacy';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // const hostName = 'localhost:9090';
-  const hostName = 'brainy.local:9090';
+  // const hostName = 'localhost:8005';
+  const hostName = 'brainy.local:8005';
   const common = {
     base: '',
     plugins: [
@@ -41,6 +41,16 @@ export default defineConfig(({ mode }) => {
         '/socket.io': {
           target: 'ws://' + hostName,
           ws: true,
+        },
+        '/remove-bg': {
+          target: 'http://' + hostName + '/remove-bg',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/remove-bg/, ''),
+        },
+        '/login': {
+          target: 'http://' + hostName + '/login',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/login/, ''),
         },
       },
     },

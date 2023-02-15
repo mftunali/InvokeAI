@@ -16,10 +16,28 @@ import ModelManagerModal from './ModelManager/ModelManagerModal';
 import LanguagePicker from './LanguagePicker';
 
 import { useTranslation } from 'react-i18next';
-import { MdSettings } from 'react-icons/md';
+import {MdLogout, MdSettings} from 'react-icons/md';
 import ModelSelectUpily from "./ModelSelectUpily";
-import { useAppSelector } from 'app/storeHooks';
+import {useAppDispatch, useAppSelector} from 'app/storeHooks';
 import type { RootState } from 'app/store';
+import {createSelector} from "@reduxjs/toolkit";
+import {systemSelector} from "../store/systemSelectors";
+import _ from "lodash";
+import {setIsLoggedIn} from "../store/systemSlice";
+
+const selector = createSelector(
+  [systemSelector],
+  (system) => {
+    const { isLoggedIn, username } = system;
+
+    return { isLoggedIn, username };
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: _.isEqual,
+    },
+  }
+);
 
 /**
  * Header, includes color mode toggle, settings button, status message.
@@ -29,6 +47,14 @@ const SiteHeader = () => {
   const appVersion = useAppSelector(
     (state: RootState) => state.system.app_version
   );
+
+
+  const dispatch = useAppDispatch();
+  const { isLoggedIn, username } = useAppSelector(selector);
+
+  function handleLogout() {
+    dispatch(setIsLoggedIn(false))
+  }
 
   return (
     <div className="site-header">
@@ -43,7 +69,7 @@ const SiteHeader = () => {
         <StatusIndicator />
 
         <ModelSelectUpily />
-        <ModelSelect />
+        {/*<ModelSelect />*/}
 
         <ModelManagerModal>
           <IAIIconButton
@@ -73,48 +99,6 @@ const SiteHeader = () => {
 
         <LanguagePicker />
 
-        <IAIIconButton
-          aria-label={t('common:reportBugLabel')}
-          tooltip={t('common:reportBugLabel')}
-          variant="link"
-          data-variant="link"
-          fontSize={20}
-          size={'sm'}
-          icon={
-            <Link isExternal href="http://github.com/invoke-ai/InvokeAI/issues">
-              <FaBug />
-            </Link>
-          }
-        />
-
-        <IAIIconButton
-          aria-label={t('common:githubLabel')}
-          tooltip={t('common:githubLabel')}
-          variant="link"
-          data-variant="link"
-          fontSize={20}
-          size={'sm'}
-          icon={
-            <Link isExternal href="http://github.com/invoke-ai/InvokeAI">
-              <FaGithub />
-            </Link>
-          }
-        />
-
-        <IAIIconButton
-          aria-label={t('common:discordLabel')}
-          tooltip={t('common:discordLabel')}
-          variant="link"
-          data-variant="link"
-          fontSize={20}
-          size={'sm'}
-          icon={
-            <Link isExternal href="https://discord.gg/ZmtBAhwWhy">
-              <FaDiscord />
-            </Link>
-          }
-        />
-
         <SettingsModal>
           <IAIIconButton
             aria-label={t('common:settingsLabel')}
@@ -126,6 +110,23 @@ const SiteHeader = () => {
             icon={<MdSettings />}
           />
         </SettingsModal>
+
+        {isLoggedIn && (
+          <>
+          {username}
+          <IAIIconButton
+            aria-label={t('common:logout')}
+            tooltip={t('common:logout')}
+            variant="link"
+            data-variant="link"
+            fontSize={22}
+            size={'sm'}
+            icon={<MdLogout />}
+            onClick={() => {handleLogout()}}
+          />
+          </>
+        )}
+
       </div>
     </div>
   );

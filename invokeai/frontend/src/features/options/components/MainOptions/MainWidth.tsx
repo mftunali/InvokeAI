@@ -19,7 +19,7 @@ export default function MainWidth() {
 
   return (
     <IAISelect
-      isDisabled={activeTabName === 'unifiedCanvas'}
+      // isDisabled={activeTabName === 'unifiedCanvas'}
       label={t('options:width')}
       value={width}
       flexGrow={1}

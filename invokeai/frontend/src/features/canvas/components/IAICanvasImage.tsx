@@ -19,6 +19,7 @@ import Konva from "konva";
 import {createSelector} from "@reduxjs/toolkit";
 import {canvasSelector} from "../store/canvasSelectors";
 import _ from "lodash";
+import {systemSelector} from "../../system/store/systemSelectors";
 
 
 const boundingBoxPreviewSelector = createSelector(
@@ -42,6 +43,23 @@ const boundingBoxPreviewSelector = createSelector(
 );
 
 
+const loginSelector = createSelector(
+  [systemSelector],
+  (system) => {
+    const { isLoggedIn, loginToken } = system;
+
+    return { isLoggedIn, loginToken };
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: _.isEqual,
+    },
+  }
+);
+
+
+
+
 type IAICanvasImageProps = {
   url: string;
   x: number;
@@ -55,8 +73,10 @@ type IAICanvasImageProps = {
 
 
 const IAICanvasImage = (props: IAICanvasImageProps) => {
+  const { isLoggedIn, loginToken } = useAppSelector(loginSelector);
   const { url, x, y, id, width, height, rotation, isSelected } = props;
-  const [image] = useImage(url);
+  const urlWithToken = url + '?token=' + loginToken;
+  const [image] = useImage(urlWithToken);
 
 
   const dispatch = useAppDispatch();

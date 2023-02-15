@@ -3,6 +3,9 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { ExpandedIndex, UseToastOptions } from '@chakra-ui/react';
 import * as InvokeAI from 'app/invokeai';
 import i18n from 'i18n';
+import {CanvasImage} from "../../canvas/store/canvasTypes";
+import {v4 as uuidv4} from "uuid";
+import {addImageToStagingArea} from "../../canvas/store/canvasSlice";
 
 export type LogLevel = 'info' | 'warning' | 'error';
 
@@ -51,6 +54,10 @@ export interface SystemState
   foundModels: InvokeAI.FoundModel[] | null;
   openModel: string | null;
   upilyModel: string;
+  loginToken: string,
+  username: string,
+  user_id: number,
+  isLoggedIn: boolean
 }
 
 const initialSystemState: SystemState = {
@@ -90,6 +97,8 @@ const initialSystemState: SystemState = {
   foundModels: null,
   openModel: null,
   upilyModel: '',
+  loginToken: '',
+  isLoggedIn: false
 };
 
 export const systemSlice = createSlice({
@@ -248,8 +257,40 @@ export const systemSlice = createSlice({
     setUpilyModel: (state, action: PayloadAction<string>) => {
       state.upilyModel = action.payload;
     },
+    setLoginInfo: (state, action: PayloadAction<string>) => {
+      state.loginToken = action.payload.access_token;
+      state.username = action.payload.username;
+      state.user_id = action.payload.user_id;
+    },
+    setIsLoggedIn: (state, action: PayloadAction<boolean>) => {
+      state.isLoggedIn = action.payload;
+    },
   },
 });
+
+
+export const login = (username, password) => {
+
+  return async (dispatch) => {
+    fetch(window.location.origin +'/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    }).then((response) => {
+      response.json().then((data) => {
+        if (response.ok) {
+          dispatch(setLoginInfo(data));
+          dispatch(setIsLoggedIn(true));
+        }
+      });
+    });
+  }
+}
 
 export const {
   setShouldDisplayInProgressType,
@@ -280,6 +321,8 @@ export const {
   setFoundModels,
   setOpenModel,
   setUpilyModel,
+  setLoginInfo,
+  setIsLoggedIn,
 } = systemSlice.actions;
 
 export default systemSlice.reducer;

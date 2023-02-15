@@ -101,7 +101,25 @@ const layerSelector = createSelector(
 );
 
 
+const loginSelector = createSelector(
+  [systemSelector],
+  (system) => {
+    const { isLoggedIn, loginToken } = system;
+
+    return { isLoggedIn, loginToken };
+  },
+  {
+    memoizeOptions: {
+      resultEqualityCheck: _.isEqual,
+    },
+  }
+);
+
+
+
 const IAICanvasOutpaintingControls = () => {
+  const { isLoggedIn, loginToken } = useAppSelector(loginSelector);
+
   const dispatch = useAppDispatch();
   const {
     boundingBoxCoordinates,
@@ -290,7 +308,7 @@ const IAICanvasOutpaintingControls = () => {
 
   const handleRemoveBackground = () => {
     dispatch(
-      removeBackground(objects, selectedImageIndex, boundingBoxCoordinates)
+      removeBackground(objects, selectedImageIndex, boundingBoxCoordinates, loginToken)
     );
   };
 

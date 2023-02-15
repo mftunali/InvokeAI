@@ -263,13 +263,6 @@ const IAICanvasAreaToolbar = () => {
     }
   };
 
-
-  const handleRemoveBackground = () => {
-    dispatch(
-      removeBackground(objects, selectedImageIndex, boundingBoxCoordinates)
-    );
-  };
-
   const handleSaveToUpilyGallery = () => {
     dispatch(
       saveToUpilyGallery(objects, selectedImageIndex)
