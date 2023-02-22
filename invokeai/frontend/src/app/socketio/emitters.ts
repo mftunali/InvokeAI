@@ -15,7 +15,7 @@ import {
   addLogEntry,
   generationRequested,
   modelChangeRequested,
-  setIsProcessing,
+  setIsProcessing, SystemState,
 } from 'features/system/store/systemSlice';
 import { InvokeTabName } from 'features/tabs/tabMap';
 import * as InvokeAI from 'app/invokeai';
@@ -147,9 +147,10 @@ const makeSocketIOEmitters = (
       socketio.emit('deleteImage', url, thumbnail, uuid, category);
     },
     emitRequestImages: (category: GalleryCategory) => {
+      const systemState: SystemState = getState().system;
       const gallery: GalleryState = getState().gallery;
       const { earliest_mtime } = gallery.categories[category];
-      socketio.emit('requestImages', category, earliest_mtime);
+      socketio.emit('requestImages', category, systemState.loginToken, earliest_mtime);
     },
     emitRequestNewImages: (category: GalleryCategory) => {
       const gallery: GalleryState = getState().gallery;
